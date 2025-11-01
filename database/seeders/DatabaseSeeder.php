@@ -13,17 +13,32 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Run seeders in the correct order
-        // 1. First create roles and permissions
-        $this->call(RolesAndPermissionsSeeder::class);
+        // Check if we're in a development environment
+        $isDevelopment = app()->environment(['local', 'development']);
 
-        // 2. Create brands
-        $this->call(BrandSeeder::class);
+        if ($isDevelopment) {
+            // Run comprehensive development seeder
+            $this->command->info('Running development seeder...');
+            $this->call(DevelopmentSeeder::class);
+        } else {
+            // Production: Run minimal seeders
+            $this->command->info('Running production seeders...');
 
-        // 3. Create categories (depends on brands)
-        $this->call(CategorySeeder::class);
+            // Run seeders in the correct order
+            // 1. First create roles and permissions
+            $this->call(RolesAndPermissionsSeeder::class);
 
-        // 4. Create users and assign to brands (depends on roles and brands)
-        $this->call(UserSeeder::class);
+            // 2. Create brands
+            $this->call(BrandSeeder::class);
+
+            // 3. Create categories (depends on brands)
+            $this->call(CategorySeeder::class);
+
+            // 4. Create users and assign to brands (depends on roles and brands)
+            $this->call(UserSeeder::class);
+
+            $this->command->info('Production seeding complete.');
+            $this->command->info('Note: For development data, run: php artisan db:seed --class=DevelopmentSeeder');
+        }
     }
 }
