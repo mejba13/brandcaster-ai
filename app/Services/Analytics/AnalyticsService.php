@@ -50,9 +50,9 @@ class AnalyticsService
             ->where('created_at', '>=', $since);
 
         $total = $drafts->clone()->count();
-        $approved = $drafts->clone()->where('status', ContentDraft::APPROVED)->count();
-        $published = $drafts->clone()->where('status', ContentDraft::PUBLISHED)->count();
-        $rejected = $drafts->clone()->where('status', ContentDraft::REJECTED)->count();
+        $approved = $drafts->clone()->where('status', ContentDraft::STATUS_APPROVED)->count();
+        $published = $drafts->clone()->where('status', ContentDraft::STATUS_PUBLISHED)->count();
+        $rejected = $drafts->clone()->where('status', ContentDraft::STATUS_REJECTED)->count();
 
         return [
             'total_generated' => $total,
@@ -79,14 +79,14 @@ class AnalyticsService
         })->where('created_at', '>=', $since);
 
         $total = $jobs->clone()->count();
-        $published = $jobs->clone()->where('status', PublishJob::PUBLISHED)->count();
-        $failed = $jobs->clone()->where('status', PublishJob::FAILED)->count();
+        $published = $jobs->clone()->where('status', PublishJob::STATUS_PUBLISHED)->count();
+        $failed = $jobs->clone()->where('status', PublishJob::STATUS_FAILED)->count();
 
         $byPlatform = PublishJob::whereHas('contentDraft', function ($query) use ($brand) {
             $query->where('brand_id', $brand->id);
         })
             ->where('created_at', '>=', $since)
-            ->where('status', PublishJob::PUBLISHED)
+            ->where('status', PublishJob::STATUS_PUBLISHED)
             ->select('platform', DB::raw('count(*) as count'))
             ->groupBy('platform')
             ->pluck('count', 'platform')
@@ -145,9 +145,9 @@ class AnalyticsService
 
         return [
             'total_discovered' => $topics->clone()->count(),
-            'used' => $topics->clone()->where('status', Topic::USED)->count(),
-            'available' => $topics->clone()->where('status', Topic::DISCOVERED)->count(),
-            'expired' => $topics->clone()->where('status', Topic::EXPIRED)->count(),
+            'used' => $topics->clone()->where('status', Topic::STATUS_USED)->count(),
+            'available' => $topics->clone()->where('status', Topic::STATUS_DISCOVERED)->count(),
+            'expired' => $topics->clone()->where('status', Topic::STATUS_EXPIRED)->count(),
             'avg_confidence_score' => round($topics->clone()->avg('confidence_score') * 100, 2),
         ];
     }
@@ -175,7 +175,7 @@ class AnalyticsService
                 'published' => PublishJob::whereHas('contentDraft', function ($query) use ($brand) {
                     $query->where('brand_id', $brand->id);
                 })
-                    ->where('status', PublishJob::PUBLISHED)
+                    ->where('status', PublishJob::STATUS_PUBLISHED)
                     ->whereDate('published_at', $date)
                     ->count(),
             ];
@@ -230,7 +230,7 @@ class AnalyticsService
         $since = now()->subDays($days);
 
         return ContentDraft::where('brand_id', $brand->id)
-            ->where('status', ContentDraft::PUBLISHED)
+            ->where('status', ContentDraft::STATUS_PUBLISHED)
             ->whereHas('publishJobs', function ($query) use ($since) {
                 $query->where('published_at', '>=', $since);
             })
@@ -269,7 +269,7 @@ class AnalyticsService
                 ->where('created_at', '>=', $since);
 
             $totalJobs = $jobs->clone()->count();
-            $publishedJobs = $jobs->clone()->where('status', PublishJob::PUBLISHED)->count();
+            $publishedJobs = $jobs->clone()->where('status', PublishJob::STATUS_PUBLISHED)->count();
 
             // Get metrics
             $metrics = Metric::whereHas('publishJob', function ($query) use ($brand, $platform, $since) {
@@ -317,8 +317,8 @@ class AnalyticsService
     {
         $since = now()->subDays($days);
 
-        return ContentDraft::where('brand_id', $brand->id)
-            ->where('created_at', '>=', $since)
+        return ContentDraft::where('content_drafts.brand_id', $brand->id)
+            ->where('content_drafts.created_at', '>=', $since)
             ->join('categories', 'content_drafts.category_id', '=', 'categories.id')
             ->select(
                 'categories.name as category_name',
@@ -400,14 +400,14 @@ class AnalyticsService
         $scheduledJobs = PublishJob::whereHas('contentDraft', function ($query) use ($brand) {
             $query->where('brand_id', $brand->id);
         })
-            ->where('status', PublishJob::SCHEDULED)
+            ->where('status', PublishJob::STATUS_PENDING)
             ->where('scheduled_at', '>=', $since)
             ->count();
 
         $publishedOnTime = PublishJob::whereHas('contentDraft', function ($query) use ($brand) {
             $query->where('brand_id', $brand->id);
         })
-            ->where('status', PublishJob::PUBLISHED)
+            ->where('status', PublishJob::STATUS_PUBLISHED)
             ->where('published_at', '>=', $since)
             ->whereRaw('ABS(TIMESTAMPDIFF(MINUTE, scheduled_at, published_at)) <= 5')
             ->count();
@@ -415,7 +415,7 @@ class AnalyticsService
         $totalPublished = PublishJob::whereHas('contentDraft', function ($query) use ($brand) {
             $query->where('brand_id', $brand->id);
         })
-            ->where('status', PublishJob::PUBLISHED)
+            ->where('status', PublishJob::STATUS_PUBLISHED)
             ->where('published_at', '>=', $since)
             ->count();
 

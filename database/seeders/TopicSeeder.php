@@ -141,10 +141,10 @@ class TopicSeeder extends Seeder
     protected function getRandomStatus(): string
     {
         $statuses = [
-            Topic::DISCOVERED => 70,  // 70% discovered
-            Topic::QUEUED => 15,      // 15% queued
-            Topic::USED => 10,        // 10% used
-            Topic::EXPIRED => 5,      // 5% expired
+            Topic::STATUS_DISCOVERED => 70,  // 70% discovered
+            Topic::STATUS_QUEUED => 15,      // 15% queued
+            Topic::STATUS_USED => 10,        // 10% used
+            Topic::STATUS_EXPIRED => 5,      // 5% expired
         ];
 
         $rand = rand(1, 100);

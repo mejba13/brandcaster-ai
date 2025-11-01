@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('account_id', 255)->nullable(); // Platform-specific ID
             $table->text('encrypted_token'); // Encrypted access token (+ refresh if applicable)
             $table->timestamp('token_expires_at')->nullable(); // Token expiry
-            $table->jsonb('platform_settings')->nullable(); // Page ID, posting defaults
-            $table->jsonb('rate_limits')->nullable(); // Max posts per hour/day
+            $table->json('platform_settings')->nullable(); // Page ID, posting defaults
+            $table->json('rate_limits')->nullable(); // Max posts per hour/day
             $table->timestamp('last_posted_at')->nullable();
             $table->boolean('active')->default(true);
             $table->timestamps();

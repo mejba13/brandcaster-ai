@@ -14,7 +14,7 @@ class MetricSeeder extends Seeder
     public function run(): void
     {
         // Get published jobs
-        $publishedJobs = PublishJob::where('status', PublishJob::PUBLISHED)->get();
+        $publishedJobs = PublishJob::where('status', PublishJob::STATUS_PUBLISHED)->get();
 
         foreach ($publishedJobs as $job) {
             // Create initial metrics

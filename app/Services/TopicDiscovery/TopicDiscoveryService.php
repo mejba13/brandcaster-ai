@@ -150,7 +150,7 @@ class TopicDiscoveryService
                         'source_urls' => $topicData['source_urls'] ?? [],
                         'confidence_score' => $topicData['confidence_score'] ?? 0.5,
                         'trending_at' => now(),
-                        'status' => Topic::DISCOVERED,
+                        'status' => Topic::STATUS_DISCOVERED,
                     ]);
 
                     $stored++;
@@ -174,9 +174,9 @@ class TopicDiscoveryService
      */
     public function expireOldTopics(int $daysOld = 7): int
     {
-        $expired = Topic::where('status', Topic::DISCOVERED)
+        $expired = Topic::where('status', Topic::STATUS_DISCOVERED)
             ->where('trending_at', '<', now()->subDays($daysOld))
-            ->update(['status' => Topic::EXPIRED]);
+            ->update(['status' => Topic::STATUS_EXPIRED]);
 
         Log::info('Expired old topics', [
             'count' => $expired,
@@ -196,7 +196,7 @@ class TopicDiscoveryService
     public function getNextTopic(Brand $brand, ?Category $category = null): ?Topic
     {
         $query = Topic::where('brand_id', $brand->id)
-            ->where('status', Topic::DISCOVERED)
+            ->where('status', Topic::STATUS_DISCOVERED)
             ->where('trending_at', '>=', now()->subDays(3)) // Fresh topics only
             ->orderBy('confidence_score', 'desc')
             ->orderBy('trending_at', 'desc');
@@ -221,7 +221,7 @@ class TopicDiscoveryService
             'discovered' => Topic::where('brand_id', $brand->id)->discovered()->count(),
             'queued' => Topic::where('brand_id', $brand->id)->queued()->count(),
             'used' => Topic::where('brand_id', $brand->id)->used()->count(),
-            'expired' => Topic::where('brand_id', $brand->id)->where('status', Topic::EXPIRED)->count(),
+            'expired' => Topic::where('brand_id', $brand->id)->where('status', Topic::STATUS_EXPIRED)->count(),
             'avg_confidence' => Topic::where('brand_id', $brand->id)
                 ->discovered()
                 ->avg('confidence_score'),

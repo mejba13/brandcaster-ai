@@ -100,7 +100,7 @@ class PublishingOrchestrator
             // Update draft status
             if ($results['success']) {
                 $draft->update([
-                    'status' => ContentDraft::PUBLISHED,
+                    'status' => ContentDraft::STATUS_PUBLISHED,
                     'published_at' => now(),
                 ]);
             }
@@ -167,7 +167,7 @@ class PublishingOrchestrator
             'content_variant_id' => $variant->id,
             'platform' => 'website',
             'connector_id' => $connector->id,
-            'status' => PublishJob::PUBLISHING,
+            'status' => PublishJob::STATUS_PROCESSING,
             'scheduled_at' => now(),
         ]);
 
@@ -190,7 +190,7 @@ class PublishingOrchestrator
 
             if ($result['success']) {
                 $publishJob->update([
-                    'status' => PublishJob::PUBLISHED,
+                    'status' => PublishJob::STATUS_PUBLISHED,
                     'published_at' => now(),
                     'result' => $result,
                     'external_id' => $result['inserted_id'] ?? null,
@@ -206,7 +206,7 @@ class PublishingOrchestrator
             }
         } catch (\Exception $e) {
             $publishJob->update([
-                'status' => PublishJob::FAILED,
+                'status' => PublishJob::STATUS_FAILED,
                 'error_message' => $e->getMessage(),
             ]);
 
@@ -298,7 +298,7 @@ class PublishingOrchestrator
             'content_variant_id' => $variant->id,
             'platform' => $platform,
             'connector_id' => $connector->id,
-            'status' => PublishJob::PUBLISHING,
+            'status' => PublishJob::STATUS_PROCESSING,
             'scheduled_at' => now(),
         ]);
 
@@ -324,7 +324,7 @@ class PublishingOrchestrator
             $result = $publisher->publish($variant, $connector);
 
             $publishJob->update([
-                'status' => PublishJob::PUBLISHED,
+                'status' => PublishJob::STATUS_PUBLISHED,
                 'published_at' => now(),
                 'result' => $result,
                 'external_id' => $result['post_id'] ?? null,
@@ -338,7 +338,7 @@ class PublishingOrchestrator
             ];
         } catch (\Exception $e) {
             $publishJob->update([
-                'status' => PublishJob::FAILED,
+                'status' => PublishJob::STATUS_FAILED,
                 'error_message' => $e->getMessage(),
             ]);
 
@@ -374,7 +374,7 @@ class PublishingOrchestrator
      */
     public function retryPublish(PublishJob $publishJob): array
     {
-        if ($publishJob->status !== PublishJob::FAILED) {
+        if ($publishJob->status !== PublishJob::STATUS_FAILED) {
             return [
                 'success' => false,
                 'error' => 'Only failed jobs can be retried',
@@ -392,7 +392,7 @@ class PublishingOrchestrator
 
         // Reset status
         $publishJob->update([
-            'status' => PublishJob::PUBLISHING,
+            'status' => PublishJob::STATUS_PROCESSING,
             'error_message' => null,
         ]);
 
@@ -406,7 +406,7 @@ class PublishingOrchestrator
             return $result;
         } catch (\Exception $e) {
             $publishJob->update([
-                'status' => PublishJob::FAILED,
+                'status' => PublishJob::STATUS_FAILED,
                 'error_message' => $e->getMessage(),
             ]);
 
@@ -425,12 +425,12 @@ class PublishingOrchestrator
      */
     public function cancelPublish(PublishJob $publishJob): bool
     {
-        if ($publishJob->status !== PublishJob::SCHEDULED) {
+        if ($publishJob->status !== PublishJob::STATUS_PENDING) {
             return false;
         }
 
         $publishJob->update([
-            'status' => PublishJob::CANCELLED,
+            'status' => PublishJob::STATUS_CANCELLED,
         ]);
 
         Log::info('Cancelled scheduled publish job', [
@@ -464,15 +464,15 @@ class PublishingOrchestrator
             ->where('created_at', '>=', $since)
             ->get();
 
-        $stats['total_published'] = $jobs->where('status', PublishJob::PUBLISHED)->count();
-        $stats['failed_jobs'] = $jobs->where('status', PublishJob::FAILED)->count();
+        $stats['total_published'] = $jobs->where('status', PublishJob::STATUS_PUBLISHED)->count();
+        $stats['failed_jobs'] = $jobs->where('status', PublishJob::STATUS_FAILED)->count();
 
         // By platform
         $platforms = ['website', 'facebook', 'twitter', 'linkedin'];
         foreach ($platforms as $platform) {
             $platformJobs = $jobs->where('platform', $platform);
-            $published = $platformJobs->where('status', PublishJob::PUBLISHED)->count();
-            $failed = $platformJobs->where('status', PublishJob::FAILED)->count();
+            $published = $platformJobs->where('status', PublishJob::STATUS_PUBLISHED)->count();
+            $failed = $platformJobs->where('status', PublishJob::STATUS_FAILED)->count();
 
             $stats['by_platform'][$platform] = [
                 'published' => $published,

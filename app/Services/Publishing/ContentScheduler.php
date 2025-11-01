@@ -221,7 +221,7 @@ class ContentScheduler
         return PublishJob::whereHas('contentDraft', function ($query) use ($brand) {
             $query->where('brand_id', $brand->id);
         })
-            ->whereIn('status', [PublishJob::SCHEDULED, PublishJob::PUBLISHING])
+            ->whereIn('status', [PublishJob::STATUS_PENDING, PublishJob::STATUS_PROCESSING])
             ->whereBetween('scheduled_at', [$dayStart, $dayEnd])
             ->count();
     }
@@ -243,7 +243,7 @@ class ContentScheduler
         return PublishJob::whereHas('contentDraft', function ($query) use ($brand) {
             $query->where('brand_id', $brand->id);
         })
-            ->whereIn('status', [PublishJob::SCHEDULED, PublishJob::PUBLISHING])
+            ->whereIn('status', [PublishJob::STATUS_PENDING, PublishJob::STATUS_PROCESSING])
             ->whereBetween('scheduled_at', [$dayStart, $dayEnd])
             ->pluck('scheduled_at')
             ->map(fn($time) => Carbon::parse($time)->setTimezone($timezone))

@@ -20,13 +20,13 @@ class SocialConnectorSeeder extends Seeder
             // Facebook connector
             SocialConnector::create([
                 'brand_id' => $brand->id,
-                'platform' => SocialConnector::FACEBOOK,
+                'platform' => SocialConnector::PLATFORM_FACEBOOK,
                 'account_name' => $brand->name . ' Page',
                 'account_id' => 'fb_' . $brand->slug . '_123456',
-                'encrypted_token' => Crypt::encryptString(json_encode([
+                'encrypted_token' => json_encode([
                     'access_token' => 'test_facebook_token_' . $brand->slug,
                     'token_type' => 'Bearer',
-                ])),
+                ]),
                 'token_expires_at' => now()->addMonths(2),
                 'platform_settings' => [
                     'page_id' => 'fb_page_' . $brand->slug,
@@ -43,13 +43,13 @@ class SocialConnectorSeeder extends Seeder
             // Twitter connector
             SocialConnector::create([
                 'brand_id' => $brand->id,
-                'platform' => SocialConnector::TWITTER,
+                'platform' => SocialConnector::PLATFORM_TWITTER,
                 'account_name' => '@' . $brand->slug,
                 'account_id' => 'tw_' . $brand->slug . '_789012',
-                'encrypted_token' => Crypt::encryptString(json_encode([
+                'encrypted_token' => json_encode([
                     'access_token' => 'test_twitter_token_' . $brand->slug,
                     'access_token_secret' => 'test_twitter_secret_' . $brand->slug,
-                ])),
+                ]),
                 'token_expires_at' => null, // Twitter tokens don't expire
                 'platform_settings' => [
                     'username' => $brand->slug,
@@ -65,13 +65,13 @@ class SocialConnectorSeeder extends Seeder
             // LinkedIn connector
             SocialConnector::create([
                 'brand_id' => $brand->id,
-                'platform' => SocialConnector::LINKEDIN,
+                'platform' => SocialConnector::PLATFORM_LINKEDIN,
                 'account_name' => $brand->name . ' Company',
                 'account_id' => 'li_' . $brand->slug . '_345678',
-                'encrypted_token' => Crypt::encryptString(json_encode([
+                'encrypted_token' => json_encode([
                     'access_token' => 'test_linkedin_token_' . $brand->slug,
                     'token_type' => 'Bearer',
-                ])),
+                ]),
                 'token_expires_at' => now()->addMonths(2),
                 'platform_settings' => [
                     'organization_id' => 'li_org_' . $brand->slug,

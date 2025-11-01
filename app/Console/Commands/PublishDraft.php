@@ -134,7 +134,7 @@ class PublishDraft extends Command
                 return collect();
             }
 
-            if ($draft->status !== ContentDraft::APPROVED) {
+            if ($draft->status !== ContentDraft::STATUS_APPROVED) {
                 $this->error("Draft is not approved (status: {$draft->status})");
                 return collect();
             }
@@ -144,7 +144,7 @@ class PublishDraft extends Command
 
         // All approved drafts
         if ($this->option('all-approved')) {
-            $query = ContentDraft::where('status', ContentDraft::APPROVED);
+            $query = ContentDraft::where('status', ContentDraft::STATUS_APPROVED);
 
             if ($brandSlug = $this->option('brand')) {
                 $query->whereHas('brand', function ($q) use ($brandSlug) {
@@ -156,7 +156,7 @@ class PublishDraft extends Command
         }
 
         // Interactive selection
-        $drafts = ContentDraft::where('status', ContentDraft::APPROVED)
+        $drafts = ContentDraft::where('status', ContentDraft::STATUS_APPROVED)
             ->with('brand')
             ->orderBy('created_at', 'desc')
             ->limit(20)

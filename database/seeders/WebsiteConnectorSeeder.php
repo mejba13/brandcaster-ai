@@ -22,13 +22,13 @@ class WebsiteConnectorSeeder extends Seeder
                 'brand_id' => $brand->id,
                 'name' => $brand->name . ' Website',
                 'driver' => 'mysql',
-                'encrypted_credentials' => Crypt::encryptString(json_encode([
+                'encrypted_credentials' => [
                     'host' => 'localhost',
                     'port' => '3306',
                     'database' => 'website_' . $brand->slug,
                     'username' => 'web_user',
                     'password' => 'secure_password',
-                ])),
+                ],
                 'table_name' => 'posts',
                 'field_mapping' => [
                     'title' => 'post_title',

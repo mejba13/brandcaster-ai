@@ -51,8 +51,9 @@ BrandCaster AI is a production-grade Laravel application that automates content 
 - PHP 8.2 or higher
 - Composer
 - Node.js 18+ and npm
-- PostgreSQL 14+ (or MySQL 8+)
+- MySQL 8+ (or PostgreSQL 14+)
 - Redis 6+
+- Laravel Herd (recommended for macOS) or traditional LAMP/LEMP stack
 
 ### Installation
 
@@ -71,35 +72,46 @@ cp .env.example .env
 # Generate application key
 php artisan key:generate
 
-# Configure database in .env
-# DB_CONNECTION=pgsql
-# DB_HOST=127.0.0.1
-# DB_PORT=5432
-# DB_DATABASE=brandcaster
-# DB_USERNAME=your_username
-# DB_PASSWORD=your_password
+# Edit .env and configure your API keys:
+# - OPENAI_API_KEY (required for AI content generation)
+# - SERPAPI_KEY (required for topic discovery)
+# - Social media OAuth credentials (optional)
 
-# Run migrations
-php artisan migrate
+# Create MySQL database
+mysql -u root -p -e "CREATE DATABASE brandcasterai CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
-# Seed database with initial data (4 brands, categories, super admin)
-php artisan db:seed
+# Or if using Laravel Herd, the database will be created automatically
+
+# Run migrations and seed with development data
+php artisan migrate:fresh --seed
+
+# This creates:
+# - All 15 database tables
+# - 4 brands with complete configurations
+# - 128 trending topics
+# - 100+ sample content drafts
+# - 1000+ engagement metrics
 
 # Build assets
 npm run build
 
-# Start development server (Laravel + Queue + Logs + Vite)
-composer dev
+# Start queue worker (required for content generation)
+php artisan horizon
+# Or in a separate terminal: php artisan queue:work
+
+# Start development server
+php artisan serve
+# Visit: http://localhost:8000
 ```
 
 ### Default Login Credentials
 
 After seeding:
-- **Email**: mejba@example.com
+- **Email**: admin@brandcaster.ai
 - **Password**: password
 - **Role**: Super Admin
 
-🔒 **Change these credentials immediately in production!**
+**⚠️ Change these credentials in production!**
 
 ---
 

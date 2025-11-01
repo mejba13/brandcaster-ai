@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('type', 50); // image, video, document
             $table->string('file_path', 500); // S3 path or URL
             $table->string('url', 500); // Public URL
-            $table->jsonb('metadata')->nullable(); // Dimensions, size, format
+            $table->json('metadata')->nullable(); // Dimensions, size, format
             $table->text('alt_text')->nullable(); // Accessibility text
             $table->timestamps();
 

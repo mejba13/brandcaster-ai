@@ -12,6 +12,25 @@ Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Content Drafts
+    Volt::route('drafts', 'content-drafts-list')->name('drafts.index');
+    Route::get('drafts/{draft}', function ($draft) {
+        return view('drafts.show', ['draftId' => $draft]);
+    })->name('drafts.show');
+
+    // Topics
+    Route::get('topics/{topic}', function ($topic) {
+        return view('topics.show', ['topicId' => $topic]);
+    })->name('topics.show');
+
+    // Brand Settings
+    Volt::route('brands/{brand}/settings', 'brand-settings')->name('brands.settings');
+
+    // Analytics
+    Volt::route('analytics', 'analytics-dashboard')->name('analytics.index');
+});
+
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 

@@ -17,7 +17,7 @@ class PublishJobSeeder extends Seeder
     public function run(): void
     {
         // Get published drafts
-        $publishedDrafts = ContentDraft::where('status', ContentDraft::PUBLISHED)->get();
+        $publishedDrafts = ContentDraft::where('status', ContentDraft::STATUS_PUBLISHED)->get();
 
         foreach ($publishedDrafts as $draft) {
             $variants = ContentVariant::where('content_draft_id', $draft->id)->get();
@@ -35,7 +35,7 @@ class PublishJobSeeder extends Seeder
                     'content_variant_id' => $variant->id,
                     'platform' => $variant->platform,
                     'connector_id' => $connector->id,
-                    'status' => PublishJob::PUBLISHED,
+                    'status' => PublishJob::STATUS_PUBLISHED,
                     'scheduled_at' => $draft->published_at->subMinutes(rand(5, 60)),
                     'published_at' => $draft->published_at,
                     'result' => $this->generatePublishResult($variant->platform, $draft),
@@ -45,7 +45,7 @@ class PublishJobSeeder extends Seeder
         }
 
         // Create some scheduled jobs for the future
-        $approvedDrafts = ContentDraft::where('status', ContentDraft::APPROVED)
+        $approvedDrafts = ContentDraft::where('status', ContentDraft::STATUS_APPROVED)
             ->limit(10)
             ->get();
 
@@ -64,7 +64,7 @@ class PublishJobSeeder extends Seeder
                     'content_variant_id' => $variant->id,
                     'platform' => $variant->platform,
                     'connector_id' => $connector->id,
-                    'status' => PublishJob::SCHEDULED,
+                    'status' => PublishJob::STATUS_PENDING,
                     'scheduled_at' => now()->addHours(rand(1, 48)),
                 ]);
             }
@@ -105,8 +105,8 @@ class PublishJobSeeder extends Seeder
             ],
             'twitter' => [
                 'success' => true,
-                'post_id' => 'tw_' . rand(1000000000000000000, 9999999999999999999),
-                'url' => 'https://twitter.com/user/status/' . rand(1000000000000000000, 9999999999999999999),
+                'post_id' => 'tw_' . time() . rand(100000, 999999),
+                'url' => 'https://twitter.com/user/status/' . time() . rand(100000, 999999),
             ],
             'linkedin' => [
                 'success' => true,
@@ -125,7 +125,7 @@ class PublishJobSeeder extends Seeder
         return match ($platform) {
             'website' => (string) rand(1000, 9999),
             'facebook' => 'fb_' . uniqid(),
-            'twitter' => 'tw_' . rand(1000000000000000000, 9999999999999999999),
+            'twitter' => 'tw_' . time() . rand(100000, 999999),
             'linkedin' => 'li_' . uniqid(),
             default => uniqid(),
         };

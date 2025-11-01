@@ -71,7 +71,7 @@ class ProcessTopicForPublishingJob implements ShouldQueue
 
         try {
             // Check if topic is still available
-            if ($this->topic->status !== Topic::DISCOVERED && $this->topic->status !== Topic::QUEUED) {
+            if ($this->topic->status !== Topic::STATUS_DISCOVERED && $this->topic->status !== Topic::STATUS_QUEUED) {
                 Log::warning('Topic is not available for processing', [
                     'topic_id' => $this->topic->id,
                     'status' => $this->topic->status,
@@ -80,7 +80,7 @@ class ProcessTopicForPublishingJob implements ShouldQueue
             }
 
             // Mark as queued
-            $this->topic->update(['status' => Topic::QUEUED]);
+            $this->topic->update(['status' => Topic::STATUS_QUEUED]);
 
             // Initiate content generation
             // Note: generateFromTopic dispatches GenerateContentBriefJob
@@ -105,7 +105,7 @@ class ProcessTopicForPublishingJob implements ShouldQueue
             ]);
 
             // Reset topic status on failure
-            $this->topic->update(['status' => Topic::DISCOVERED]);
+            $this->topic->update(['status' => Topic::STATUS_DISCOVERED]);
 
             throw $e;
         }
@@ -122,7 +122,7 @@ class ProcessTopicForPublishingJob implements ShouldQueue
         ]);
 
         // Reset topic status so it can be retried later
-        $this->topic->update(['status' => Topic::DISCOVERED]);
+        $this->topic->update(['status' => Topic::STATUS_DISCOVERED]);
     }
 
     /**

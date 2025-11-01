@@ -78,7 +78,7 @@ class PublishingEngine
         foreach ($topics as $topic) {
             try {
                 // Mark topic as queued
-                $topic->update(['status' => Topic::QUEUED]);
+                $topic->update(['status' => Topic::STATUS_QUEUED]);
 
                 // Dispatch content generation workflow
                 GenerateContentBriefJob::dispatch($topic);
@@ -111,12 +111,12 @@ class PublishingEngine
      */
     public function generateFromTopic(Topic $topic, bool $autoApprove = false): ?ContentDraft
     {
-        if ($topic->status === Topic::USED) {
+        if ($topic->status === Topic::STATUS_USED) {
             throw new \InvalidArgumentException('Topic has already been used');
         }
 
         // Mark as queued
-        $topic->update(['status' => Topic::QUEUED]);
+        $topic->update(['status' => Topic::STATUS_QUEUED]);
 
         // Dispatch the workflow
         GenerateContentBriefJob::dispatch($topic);
@@ -140,7 +140,7 @@ class PublishingEngine
      */
     public function publishDraft(ContentDraft $draft, array $options = []): array
     {
-        if ($draft->status !== ContentDraft::APPROVED) {
+        if ($draft->status !== ContentDraft::STATUS_APPROVED) {
             throw new \InvalidArgumentException('Draft must be approved before publishing');
         }
 
@@ -207,7 +207,7 @@ class PublishingEngine
             try {
                 $draft = ContentDraft::findOrFail($draftId);
 
-                if ($draft->status !== ContentDraft::APPROVED) {
+                if ($draft->status !== ContentDraft::STATUS_APPROVED) {
                     $stats['errors']++;
                     continue;
                 }
@@ -295,7 +295,7 @@ class PublishingEngine
     public function autoApprove(Brand $brand, float $threshold = 0.8): int
     {
         $drafts = ContentDraft::where('brand_id', $brand->id)
-            ->where('status', ContentDraft::PENDING_REVIEW)
+            ->where('status', ContentDraft::STATUS_PENDING_REVIEW)
             ->where('confidence_score', '>=', $threshold)
             ->get();
 
@@ -304,7 +304,7 @@ class PublishingEngine
         foreach ($drafts as $draft) {
             try {
                 $draft->update([
-                    'status' => ContentDraft::APPROVED,
+                    'status' => ContentDraft::STATUS_APPROVED,
                     'approved_by' => null, // System approval
                     'approved_at' => now(),
                 ]);
@@ -336,7 +336,7 @@ class PublishingEngine
     protected function getAvailableTopics(Brand $brand, array $options = [])
     {
         $query = Topic::where('brand_id', $brand->id)
-            ->where('status', Topic::DISCOVERED)
+            ->where('status', Topic::STATUS_DISCOVERED)
             ->where('trending_at', '>=', now()->subDays(3)) // Fresh topics only
             ->where('confidence_score', '>=', 0.6) // Minimum quality threshold
             ->orderBy('confidence_score', 'desc')
@@ -365,11 +365,11 @@ class PublishingEngine
                 ->where('created_at', '>=', $since)
                 ->count(),
             'content_approved' => ContentDraft::where('brand_id', $brand->id)
-                ->where('status', ContentDraft::APPROVED)
+                ->where('status', ContentDraft::STATUS_APPROVED)
                 ->where('approved_at', '>=', $since)
                 ->count(),
             'content_published' => ContentDraft::where('brand_id', $brand->id)
-                ->where('status', ContentDraft::PUBLISHED)
+                ->where('status', ContentDraft::STATUS_PUBLISHED)
                 ->whereHas('publishJobs', function ($query) use ($since) {
                     $query->where('published_at', '>=', $since);
                 })
@@ -378,7 +378,7 @@ class PublishingEngine
                 ->where('created_at', '>=', $since)
                 ->count(),
             'topics_used' => Topic::where('brand_id', $brand->id)
-                ->where('status', Topic::USED)
+                ->where('status', Topic::STATUS_USED)
                 ->where('updated_at', '>=', $since)
                 ->count(),
             'avg_confidence_score' => ContentDraft::where('brand_id', $brand->id)
@@ -401,11 +401,11 @@ class PublishingEngine
      */
     public function cleanup(int $daysOld = 30): array
     {
-        $deletedDrafts = ContentDraft::where('status', ContentDraft::REJECTED)
+        $deletedDrafts = ContentDraft::where('status', ContentDraft::STATUS_REJECTED)
             ->where('created_at', '<', now()->subDays($daysOld))
             ->delete();
 
-        $expiredTopics = Topic::where('status', Topic::EXPIRED)
+        $expiredTopics = Topic::where('status', Topic::STATUS_EXPIRED)
             ->where('trending_at', '<', now()->subDays($daysOld))
             ->delete();
 

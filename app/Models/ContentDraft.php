@@ -51,7 +51,11 @@ class ContentDraft extends Model
         return [
             'outline' => 'array',
             'seo_metadata' => 'array',
+            'keywords' => 'array',
+            'confidence_score' => 'decimal:4',
             'approved_at' => 'datetime',
+            'published_at' => 'datetime',
+            'generated_at' => 'datetime',
         ];
     }
 
@@ -73,6 +77,16 @@ class ContentDraft extends Model
     public function topic(): BelongsTo
     {
         return $this->belongsTo(Topic::class);
+    }
+
+    /**
+     * Get the category this content belongs to.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
     }
 
     /**

@@ -36,16 +36,16 @@ class DevelopmentSeeder extends Seeder
 
         // Run seeders in order
         $seeders = [
-            'RolesAndPermissionsSeeder' => 'Setting up roles and permissions',
-            'BrandSeeder' => 'Creating brands',
-            'CategorySeeder' => 'Creating categories',
-            'UserSeeder' => 'Creating users',
-            'WebsiteConnectorSeeder' => 'Setting up website connectors',
-            'SocialConnectorSeeder' => 'Setting up social media connectors',
-            'TopicSeeder' => 'Discovering trending topics',
-            'ContentDraftSeeder' => 'Generating content drafts',
-            'PublishJobSeeder' => 'Creating publishing jobs',
-            'MetricSeeder' => 'Collecting engagement metrics',
+            RolesAndPermissionsSeeder::class => 'Setting up roles and permissions',
+            BrandSeeder::class => 'Creating brands',
+            CategorySeeder::class => 'Creating categories',
+            UserSeeder::class => 'Creating users',
+            WebsiteConnectorSeeder::class => 'Setting up website connectors',
+            SocialConnectorSeeder::class => 'Setting up social media connectors',
+            TopicSeeder::class => 'Discovering trending topics',
+            ContentDraftSeeder::class => 'Generating content drafts',
+            PublishJobSeeder::class => 'Creating publishing jobs',
+            MetricSeeder::class => 'Collecting engagement metrics',
         ];
 
         foreach ($seeders as $seeder => $description) {

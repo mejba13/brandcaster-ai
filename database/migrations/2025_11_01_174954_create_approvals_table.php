@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('approvals', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('content_draft_id');
-            $table->uuid('user_id'); // Reviewer
+            $table->unsignedBigInteger('user_id'); // Reviewer
             $table->string('status', 50); // approved, rejected, changes_requested
             $table->text('comments')->nullable(); // Review notes
-            $table->jsonb('changes')->nullable(); // Suggested edits
+            $table->json('changes')->nullable(); // Suggested edits
             $table->timestamp('reviewed_at'); // When reviewed
             $table->timestamps();
 

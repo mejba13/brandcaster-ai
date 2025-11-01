@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string('platform', 50); // website, facebook, twitter, linkedin
             $table->string('title', 500)->nullable(); // Platform-specific title
             $table->text('content'); // Formatted content for platform
-            $table->jsonb('formatting')->nullable(); // Hashtags, mentions, emojis
-            $table->jsonb('metadata')->nullable(); // Platform-specific fields
+            $table->json('formatting')->nullable(); // Hashtags, mentions, emojis
+            $table->json('metadata')->nullable(); // Platform-specific fields
             $table->timestamp('scheduled_for')->nullable(); // When to publish
             $table->string('status', 50)->default('pending'); // pending, scheduled, published, failed
             $table->timestamps();

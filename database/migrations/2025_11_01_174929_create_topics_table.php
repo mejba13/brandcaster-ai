@@ -17,8 +17,8 @@ return new class extends Migration
             $table->uuid('category_id');
             $table->string('title', 500); // Topic headline
             $table->text('description')->nullable(); // Brief description
-            $table->jsonb('keywords'); // Related keywords
-            $table->jsonb('source_urls'); // Sources (articles, tweets)
+            $table->json('keywords'); // Related keywords
+            $table->json('source_urls'); // Sources (articles, tweets)
             $table->decimal('confidence_score', 5, 4)->default(0.0); // Relevance score 0-1
             $table->timestamp('trending_at'); // When topic started trending
             $table->timestamp('used_at')->nullable(); // When used for content

@@ -59,6 +59,16 @@ class PublishJob extends Model
     }
 
     /**
+     * Get the content draft this job is for.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function contentDraft(): BelongsTo
+    {
+        return $this->belongsTo(ContentDraft::class);
+    }
+
+    /**
      * Get the content variant this job is for.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

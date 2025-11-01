@@ -49,21 +49,21 @@ new class extends Component {
         }
 
         $this->stats = [
-            'pending_review' => $query->clone()->where('status', ContentDraft::PENDING_REVIEW)->count(),
-            'approved' => $query->clone()->where('status', ContentDraft::APPROVED)->count(),
+            'pending_review' => $query->clone()->where('status', ContentDraft::STATUS_PENDING_REVIEW)->count(),
+            'approved' => $query->clone()->where('status', ContentDraft::STATUS_APPROVED)->count(),
             'published_today' => $query->clone()
-                ->where('status', ContentDraft::PUBLISHED)
+                ->where('status', ContentDraft::STATUS_PUBLISHED)
                 ->whereDate('published_at', today())
                 ->count(),
             'topics_discovered' => Topic::when($this->selectedBrand, fn($q) => $q->where('brand_id', $this->selectedBrand))
-                ->where('status', Topic::DISCOVERED)
+                ->where('status', Topic::STATUS_DISCOVERED)
                 ->count(),
         ];
 
         // Recent drafts
         $this->recentDrafts = ContentDraft::with('brand', 'category')
             ->when($this->selectedBrand, fn($q) => $q->where('brand_id', $this->selectedBrand))
-            ->where('status', ContentDraft::PENDING_REVIEW)
+            ->where('status', ContentDraft::STATUS_PENDING_REVIEW)
             ->latest()
             ->take(5)
             ->get();
@@ -75,7 +75,7 @@ new class extends Component {
                     $q->where('brand_id', $this->selectedBrand);
                 }
             })
-            ->where('status', PublishJob::SCHEDULED)
+            ->where('status', PublishJob::STATUS_PENDING)
             ->where('scheduled_at', '>', now())
             ->orderBy('scheduled_at')
             ->take(5)
@@ -84,7 +84,7 @@ new class extends Component {
         // Top topics
         $this->topTopics = Topic::with('category')
             ->when($this->selectedBrand, fn($q) => $q->where('brand_id', $this->selectedBrand))
-            ->where('status', Topic::DISCOVERED)
+            ->where('status', Topic::STATUS_DISCOVERED)
             ->orderBy('confidence_score', 'desc')
             ->take(5)
             ->get();
@@ -101,7 +101,7 @@ new class extends Component {
         }
 
         $draft->update([
-            'status' => ContentDraft::APPROVED,
+            'status' => ContentDraft::STATUS_APPROVED,
             'approved_by' => auth()->id(),
             'approved_at' => now(),
         ]);

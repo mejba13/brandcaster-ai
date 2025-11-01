@@ -22,8 +22,8 @@ class ContentDraftSeeder extends Seeder
         foreach ($brands as $brand) {
             // Get topics for this brand
             $topics = Topic::where('brand_id', $brand->id)
-                ->where('status', Topic::USED)
-                ->orWhere('status', Topic::QUEUED)
+                ->where('status', Topic::STATUS_USED)
+                ->orWhere('status', Topic::STATUS_QUEUED)
                 ->get();
 
             foreach ($topics as $topic) {
@@ -39,20 +39,20 @@ class ContentDraftSeeder extends Seeder
                     'keywords' => $topic->keywords,
                     'confidence_score' => $topic->confidence_score,
                     'status' => $status,
-                    'approved_by' => in_array($status, [ContentDraft::APPROVED, ContentDraft::PUBLISHED])
+                    'approved_by' => in_array($status, [ContentDraft::STATUS_APPROVED, ContentDraft::STATUS_PUBLISHED])
                         ? $users->random()->id
                         : null,
-                    'approved_at' => in_array($status, [ContentDraft::APPROVED, ContentDraft::PUBLISHED])
+                    'approved_at' => in_array($status, [ContentDraft::STATUS_APPROVED, ContentDraft::STATUS_PUBLISHED])
                         ? now()->subDays(rand(0, 5))
                         : null,
-                    'published_at' => $status === ContentDraft::PUBLISHED
+                    'published_at' => $status === ContentDraft::STATUS_PUBLISHED
                         ? now()->subDays(rand(0, 10))
                         : null,
                     'generated_at' => now()->subDays(rand(1, 15)),
                 ]);
 
                 // Create variants for drafts that are approved or published
-                if (in_array($status, [ContentDraft::APPROVED, ContentDraft::PUBLISHED])) {
+                if (in_array($status, [ContentDraft::STATUS_APPROVED, ContentDraft::STATUS_PUBLISHED])) {
                     $this->createVariants($draft);
                 }
             }
@@ -74,7 +74,7 @@ class ContentDraftSeeder extends Seeder
                     ],
                     'keywords' => ['sample', 'content'],
                     'confidence_score' => rand(60, 85) / 100,
-                    'status' => ContentDraft::PENDING_REVIEW,
+                    'status' => ContentDraft::STATUS_PENDING_REVIEW,
                     'generated_at' => now()->subDays(rand(0, 3)),
                 ]);
             }
@@ -89,10 +89,10 @@ class ContentDraftSeeder extends Seeder
     protected function getRandomStatus(): string
     {
         $statuses = [
-            ContentDraft::PENDING_REVIEW => 30,
-            ContentDraft::APPROVED => 25,
-            ContentDraft::PUBLISHED => 40,
-            ContentDraft::REJECTED => 5,
+            ContentDraft::STATUS_PENDING_REVIEW => 30,
+            ContentDraft::STATUS_APPROVED => 25,
+            ContentDraft::STATUS_PUBLISHED => 40,
+            ContentDraft::STATUS_REJECTED => 5,
         ];
 
         $rand = rand(1, 100);
@@ -105,7 +105,7 @@ class ContentDraftSeeder extends Seeder
             }
         }
 
-        return ContentDraft::PENDING_REVIEW;
+        return ContentDraft::STATUS_PENDING_REVIEW;
     }
 
     /**
@@ -172,7 +172,7 @@ HTML;
                 'content' => $this->generateVariantContent($draft, $platform),
                 'formatting' => $this->getFormattingForPlatform($platform),
                 'metadata' => $this->getMetadataForPlatform($platform, $draft),
-                'status' => ContentVariant::STATUS_READY,
+                'status' => ContentVariant::STATUS_PENDING,
             ]);
         }
     }

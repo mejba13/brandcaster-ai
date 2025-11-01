@@ -68,7 +68,7 @@ class PublishContentJob implements ShouldQueue
 
         try {
             // Check if draft is approved
-            if ($this->draft->status !== ContentDraft::APPROVED) {
+            if ($this->draft->status !== ContentDraft::STATUS_APPROVED) {
                 Log::warning('Attempted to publish non-approved draft', [
                     'draft_id' => $this->draft->id,
                     'status' => $this->draft->status,
@@ -77,7 +77,7 @@ class PublishContentJob implements ShouldQueue
             }
 
             // Check if already published
-            if ($this->draft->status === ContentDraft::PUBLISHED) {
+            if ($this->draft->status === ContentDraft::STATUS_PUBLISHED) {
                 Log::warning('Draft already published', [
                     'draft_id' => $this->draft->id,
                 ]);

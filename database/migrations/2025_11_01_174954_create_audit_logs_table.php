@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('audit_logs', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid('user_id')->nullable(); // NULL for system actions
+            $table->unsignedBigInteger('user_id')->nullable(); // NULL for system actions
             $table->string('action', 255); // created, updated, deleted, published, etc.
             $table->string('auditable_type', 255); // Polymorphic model name
             $table->uuid('auditable_id'); // Polymorphic model ID
-            $table->jsonb('old_values')->nullable(); // Before state
-            $table->jsonb('new_values')->nullable(); // After state
+            $table->json('old_values')->nullable(); // Before state
+            $table->json('new_values')->nullable(); // After state
             $table->string('ip_address', 45)->nullable(); // IPv4 or IPv6
             $table->text('user_agent')->nullable();
             $table->timestamp('created_at');

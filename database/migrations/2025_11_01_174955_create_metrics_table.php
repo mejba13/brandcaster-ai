@@ -14,10 +14,14 @@ return new class extends Migration
         Schema::create('metrics', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->uuid('publish_job_id');
-            $table->string('metric_type', 50); // impressions, clicks, likes, shares, comments, ctr
-            $table->bigInteger('value'); // Metric value
-            $table->timestamp('recorded_at'); // When metric was fetched
-            $table->jsonb('metadata')->nullable(); // Additional context
+            $table->unsignedBigInteger('impressions')->default(0);
+            $table->unsignedBigInteger('clicks')->default(0);
+            $table->unsignedBigInteger('likes')->default(0);
+            $table->unsignedBigInteger('shares')->default(0);
+            $table->unsignedBigInteger('comments')->default(0);
+            $table->unsignedBigInteger('saves')->default(0);
+            $table->date('metric_date'); // Date of the metrics
+            $table->json('metadata')->nullable(); // Additional context
             $table->timestamps();
 
             // Foreign keys
@@ -25,7 +29,7 @@ return new class extends Migration
 
             // Indexes
             $table->index('publish_job_id', 'metrics_publish_job_id_index');
-            $table->index(['metric_type', 'recorded_at'], 'metrics_metric_type_recorded_at_index');
+            $table->index('metric_date', 'metrics_metric_date_index');
         });
     }
 

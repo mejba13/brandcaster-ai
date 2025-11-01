@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('driver', 50); // mysql, pgsql, sqlsrv
             $table->text('encrypted_credentials'); // Encrypted JSON of host, port, db, user, pass
             $table->string('table_name', 255); // Target table (e.g., wp_posts)
-            $table->jsonb('field_mapping'); // Map app fields to DB columns
-            $table->jsonb('status_workflow')->nullable(); // Map statuses (draft=0, published=1)
+            $table->json('field_mapping'); // Map app fields to DB columns
+            $table->json('status_workflow')->nullable(); // Map statuses (draft=0, published=1)
             $table->string('slug_policy', 50)->default('auto_generate'); // auto_generate, manual
             $table->string('timezone', 50)->default('UTC');
             $table->timestamp('last_tested_at')->nullable(); // Last successful connection test

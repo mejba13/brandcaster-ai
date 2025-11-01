@@ -129,7 +129,7 @@ class GenerateContentVariantsJob implements ShouldQueue
                 if ($autoApprove && $highQuality) {
                     // Auto-approve high-quality content
                     $this->contentDraft->update([
-                        'status' => ContentDraft::APPROVED,
+                        'status' => ContentDraft::STATUS_APPROVED,
                         'approved_by' => null, // System approval
                         'approved_at' => now(),
                     ]);
@@ -154,7 +154,7 @@ class GenerateContentVariantsJob implements ShouldQueue
                 } else {
                     // Manual review required
                     $this->contentDraft->update([
-                        'status' => ContentDraft::PENDING_REVIEW,
+                        'status' => ContentDraft::STATUS_PENDING_REVIEW,
                     ]);
                 }
             }

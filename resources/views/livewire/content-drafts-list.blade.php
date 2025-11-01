@@ -72,10 +72,10 @@ new class extends Component {
 
         return [
             'all' => $query->clone()->count(),
-            'pending_review' => $query->clone()->where('status', ContentDraft::PENDING_REVIEW)->count(),
-            'approved' => $query->clone()->where('status', ContentDraft::APPROVED)->count(),
-            'published' => $query->clone()->where('status', ContentDraft::PUBLISHED)->count(),
-            'rejected' => $query->clone()->where('status', ContentDraft::REJECTED)->count(),
+            'pending_review' => $query->clone()->where('status', ContentDraft::STATUS_PENDING_REVIEW)->count(),
+            'approved' => $query->clone()->where('status', ContentDraft::STATUS_APPROVED)->count(),
+            'published' => $query->clone()->where('status', ContentDraft::STATUS_PUBLISHED)->count(),
+            'rejected' => $query->clone()->where('status', ContentDraft::STATUS_REJECTED)->count(),
         ];
     }
 
@@ -102,7 +102,7 @@ new class extends Component {
         }
 
         $draft->update([
-            'status' => ContentDraft::APPROVED,
+            'status' => ContentDraft::STATUS_APPROVED,
             'approved_by' => auth()->id(),
             'approved_at' => now(),
         ]);
@@ -126,7 +126,7 @@ new class extends Component {
         }
 
         $draft->update([
-            'status' => ContentDraft::REJECTED,
+            'status' => ContentDraft::STATUS_REJECTED,
         ]);
 
         $this->dispatch('notify', [
@@ -147,7 +147,7 @@ new class extends Component {
             return;
         }
 
-        if ($draft->status !== ContentDraft::APPROVED) {
+        if ($draft->status !== ContentDraft::STATUS_APPROVED) {
             $this->dispatch('notify', [
                 'type' => 'error',
                 'message' => 'Content must be approved before publishing',
@@ -215,31 +215,31 @@ new class extends Component {
             </button>
 
             <button
-                wire:click="$set('statusFilter', '{{ ContentDraft::PENDING_REVIEW }}')"
-                class="@if($statusFilter === ContentDraft::PENDING_REVIEW) border-orange-500 text-orange-600 dark:text-orange-400 @else border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 @endif whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+                wire:click="$set('statusFilter', '{{ ContentDraft::STATUS_PENDING_REVIEW }}')"
+                class="@if($statusFilter === ContentDraft::STATUS_PENDING_REVIEW) border-orange-500 text-orange-600 dark:text-orange-400 @else border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 @endif whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
             >
                 Pending Review
-                <span class="ml-2 py-0.5 px-2.5 rounded-full text-xs font-medium @if($statusFilter === ContentDraft::PENDING_REVIEW) bg-orange-100 text-orange-600 dark:bg-orange-900 dark:text-orange-200 @else bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-300 @endif">
+                <span class="ml-2 py-0.5 px-2.5 rounded-full text-xs font-medium @if($statusFilter === ContentDraft::STATUS_PENDING_REVIEW) bg-orange-100 text-orange-600 dark:bg-orange-900 dark:text-orange-200 @else bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-300 @endif">
                     {{ $statusCounts['pending_review'] }}
                 </span>
             </button>
 
             <button
-                wire:click="$set('statusFilter', '{{ ContentDraft::APPROVED }}')"
-                class="@if($statusFilter === ContentDraft::APPROVED) border-green-500 text-green-600 dark:text-green-400 @else border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 @endif whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+                wire:click="$set('statusFilter', '{{ ContentDraft::STATUS_APPROVED }}')"
+                class="@if($statusFilter === ContentDraft::STATUS_APPROVED) border-green-500 text-green-600 dark:text-green-400 @else border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 @endif whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
             >
                 Approved
-                <span class="ml-2 py-0.5 px-2.5 rounded-full text-xs font-medium @if($statusFilter === ContentDraft::APPROVED) bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-200 @else bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-300 @endif">
+                <span class="ml-2 py-0.5 px-2.5 rounded-full text-xs font-medium @if($statusFilter === ContentDraft::STATUS_APPROVED) bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-200 @else bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-300 @endif">
                     {{ $statusCounts['approved'] }}
                 </span>
             </button>
 
             <button
-                wire:click="$set('statusFilter', '{{ ContentDraft::PUBLISHED }}')"
-                class="@if($statusFilter === ContentDraft::PUBLISHED) border-blue-500 text-blue-600 dark:text-blue-400 @else border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 @endif whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+                wire:click="$set('statusFilter', '{{ ContentDraft::STATUS_PUBLISHED }}')"
+                class="@if($statusFilter === ContentDraft::STATUS_PUBLISHED) border-blue-500 text-blue-600 dark:text-blue-400 @else border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300 @endif whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
             >
                 Published
-                <span class="ml-2 py-0.5 px-2.5 rounded-full text-xs font-medium @if($statusFilter === ContentDraft::PUBLISHED) bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-200 @else bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-300 @endif">
+                <span class="ml-2 py-0.5 px-2.5 rounded-full text-xs font-medium @if($statusFilter === ContentDraft::STATUS_PUBLISHED) bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-200 @else bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-300 @endif">
                     {{ $statusCounts['published'] }}
                 </span>
             </button>
@@ -328,10 +328,10 @@ new class extends Component {
                         <td class="px-6 py-4 whitespace-nowrap">
                             @php
                                 $statusColors = [
-                                    ContentDraft::PENDING_REVIEW => 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
-                                    ContentDraft::APPROVED => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-                                    ContentDraft::PUBLISHED => 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-                                    ContentDraft::REJECTED => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+                                    ContentDraft::STATUS_PENDING_REVIEW => 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
+                                    ContentDraft::STATUS_APPROVED => 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+                                    ContentDraft::STATUS_PUBLISHED => 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+                                    ContentDraft::STATUS_REJECTED => 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
                                 ];
                             @endphp
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusColors[$draft->status] ?? 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200' }}">
@@ -349,7 +349,7 @@ new class extends Component {
                                 View
                             </a>
 
-                            @if($draft->status === ContentDraft::PENDING_REVIEW)
+                            @if($draft->status === ContentDraft::STATUS_PENDING_REVIEW)
                                 @can('approve content')
                                     <button
                                         wire:click="approve({{ $draft->id }})"
@@ -366,7 +366,7 @@ new class extends Component {
                                 @endcan
                             @endif
 
-                            @if($draft->status === ContentDraft::APPROVED)
+                            @if($draft->status === ContentDraft::STATUS_APPROVED)
                                 @can('publish content')
                                     <button
                                         wire:click="publishNow({{ $draft->id }})"
